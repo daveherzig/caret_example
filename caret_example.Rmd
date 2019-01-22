@@ -1,0 +1,38 @@
+---
+title: "Simple Caret Example"
+output: html_document
+author: David Herzig
+---
+
+# Loading libraries
+```{r setup}
+library(caret)
+```
+
+# Loading sample data
+```{r}
+sampledata = read.csv("/Users/herzigd/projects/DataGenerator/sampedata.csv", header=T)
+dim(sampledata)
+head(sampledata)
+```
+
+# Split data into a training and test set
+```{r}
+test_inds = createDataPartition(y = 1:dim(sampledata)[1], p = 0.25, list = F)
+
+traindata = sampledata[-test_inds,]
+testdata = sampledata[test_inds,]
+```
+
+# Train the model
+The output column result is a function depending on value1, value2 and value3.
+```{r}
+model = train(as.factor(result) ~ ., data=traindata, method="ranger")
+```
+
+# Make predictions
+The model will now be used to evaluate the test data set.
+```{r}
+testdata_prediction = predict(model, testdata)
+confusionMatrix(testdata_prediction, as.factor(testdata$result))
+```
